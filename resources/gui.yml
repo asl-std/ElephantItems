@@ -1,0 +1,46 @@
+#If you don't know how it works - DONT EDIT!
+sharedBtns:
+  backToEditor: CRAFTING_TABLE:1:0:100002♥&6Back to Item Editor
+gui-main-page:
+  title: 'EIEditor: Choose item first'
+  btnCreateItem: WRITABLE_BOOK:1:0:100001♥&6Create new Item!♣unbreaking:1♠HIDE_ENCHANTS;unbreakable
+enchants:
+  template: $0:1:0:0♥&e$1 | Lv.$2
+  fire_protection: Fire Protection
+  sharpness: Sharpness
+  flame: Flame
+  soul_speed: Soul Speed
+  aqua_affinity: Aqua Affinity
+  punch: Punch
+  loyalty: Loyalty
+  depth_strider: Depth Strider
+  vanishing_curse: Vanishing Curse
+  unbreaking: Unbreaking
+  knockback: Knockback
+  luck_of_the_sea: Luck Of The Sea
+  binding_curse: Binding Curse
+  fortune: Fortune
+  protection: Protection
+  efficiency: Efficiency
+  mending: Mending
+  frost_walker: Frost Walker
+  lure: Lure
+  looting: Looting
+  piercing: Piercing
+  blast_protection: Blast Protection
+  smite: Smite
+  multishot: Multishot
+  fire_aspect: Fire Aspect
+  chanelling: Chanelling
+  sweeping: Sweeping
+  thorns: Thorns
+  bane_of_arthropods: Bane Of Arthropods
+  respiration: Respiration
+  riptide: Riptide
+  silk_touch: Silk Touch
+  quick_charge: Quick Charge
+  projectile_protection: Projectile Protection
+  impaling: Impaling
+  feather_falling: Feather Falling
+  power: Power
+  infinity: Infinity

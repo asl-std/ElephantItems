@@ -1,0 +1,172 @@
+package org.aslstd.api.durability;
+
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.aslstd.api.bukkit.equip.EquipSlot;
+import org.aslstd.api.bukkit.equip.EquipType;
+import org.aslstd.api.bukkit.events.equipment.EquipChangeEvent;
+import org.aslstd.api.bukkit.items.IStatus;
+import org.aslstd.api.bukkit.items.InventoryUtil;
+import org.aslstd.api.bukkit.items.ItemStackUtil;
+import org.aslstd.api.bukkit.message.EText;
+import org.aslstd.api.bukkit.utils.BasicMetaAdapter;
+import org.aslstd.api.bukkit.value.util.NumUtil;
+import org.aslstd.core.Core;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+public class DManager { // Durability Manager
+
+	public static Pattern	repairableDurability	= Pattern.compile(EText.e(Core.getLang().NAME_DURABILITY.toLowerCase()) + ".?\\s\\[([-+]?\\d+\\/\\d+)\\]");
+	public static Pattern	nonRepairableDurability	= Pattern.compile(EText.e(Core.getLang().NAME_DURABILITY.toLowerCase()) + ".?\\s\\[([-+]?\\d+)\\]");
+
+	public static ItemStack changeDurability(ItemStack stack, int amount, int max) {
+		final Pattern patt = DManager.checkDurabilityType(stack);
+		if (patt == null) return stack;
+		final List<String> lore = stack.getItemMeta().getLore();
+		final ItemMeta meta = stack.getItemMeta();
+
+		final int index = BasicMetaAdapter.indexOf(lore, patt);
+		final String val = BasicMetaAdapter.getStringValue(patt, lore);
+		if (val == null || val.equalsIgnoreCase("") || !val.matches("(-)?[0-9]*(/)?[0-9]*")) return stack;
+		final String[] value = val.split("/");
+
+		if (value.length < 1) return stack;
+		final int first = NumUtil.parseInteger(value[0]);
+		int second = max;
+
+		if (value.length > 1) {
+			if (second <= 0)
+				second = NumUtil.parseInteger(value[1]);
+			lore.set(index, DManager.getDurabilityLore((first + amount) + "", second + ""));
+		}
+
+		if (value.length == 1)
+			lore.set(index, DManager.getDurabilityLore((first + amount) + ""));
+
+		meta.setLore(lore);
+		stack.setItemMeta(meta);
+		return stack;
+	}
+
+	public static Pattern checkDurabilityType(ItemStack stack) {
+		if (!ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return null;
+		else return checkDurabilityType(stack.getItemMeta().getLore());
+	}
+
+	public static boolean isRepairable(ItemStack stack) {
+		return BasicMetaAdapter.contains(stack, repairableDurability);
+	}
+
+	public static Pattern checkDurabilityType(List<String> lore) {
+		if (BasicMetaAdapter.contains(lore, DManager.repairableDurability)) return DManager.repairableDurability;
+		if (BasicMetaAdapter.contains(lore, DManager.nonRepairableDurability)) return DManager.nonRepairableDurability;
+		else return null;
+	}
+
+	public static void decreaseArmorDurability(Player p, int amount) {
+		final ItemStack[] armourSet = new ItemStack[] { p.getInventory().getHelmet(), p.getInventory().getChestplate(), p.getInventory().getLeggings(), p.getInventory().getBoots() };
+
+		for (int i = 0; i < 4; i++) {
+			if (!NumUtil.isNegative(amount + "")) amount = amount * -1;
+			final Pattern patt = DManager.checkDurabilityType(armourSet[i]);
+			if (patt == null) continue;
+
+			DManager.changeDurability(armourSet[i], amount, 0);
+			final String val = BasicMetaAdapter.getStringValue(patt, armourSet[i]);
+			if (val != null && !val.equals(""))
+				if (NumUtil.parseInteger(val.split("/")[0]) < 1) {
+					armourSet[i] = null;
+
+					final EquipSlot slot = EquipSlot.byID(39-i);
+
+					Bukkit.getPluginManager().callEvent(new EquipChangeEvent(slot, null, p));
+				}
+		}
+
+		p.getInventory().setHelmet(armourSet[0]);
+		p.getInventory().setChestplate(armourSet[1]);
+		p.getInventory().setLeggings(armourSet[2]);
+		p.getInventory().setBoots(armourSet[3]);
+	}
+
+	public static void decreaseDurability(Player p, EquipSlot slot, int amount) {
+		final ItemStack stack = EquipSlot.getStackFromSlot(slot, p);
+
+		if (!ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return;
+
+		final Pattern patt = DManager.checkDurabilityType(stack);
+		if (patt == null) return;
+
+		final String[] value = BasicMetaAdapter.getStringValue(patt, stack).split("/");
+		if (value.length < 1) return;
+		if (!NumUtil.isNegative(amount + "")) amount = amount * -1;
+		if (NumUtil.parseInteger(value[0]) - amount <= 1) {
+			InventoryUtil.decreaseItemAmount(stack, p, 1);
+
+			Bukkit.getPluginManager().callEvent(new EquipChangeEvent(slot, null, p));
+		}
+		else DManager.changeDurability(stack, amount, 0);
+
+	}
+
+	public static String getDurabilityLore(String... values) {
+		final String prepaired = Core.getLang().NAME_DURABILITY + ": " + Core.getLang().DURABILITY_SUFFIX_COLOR_DECORATOR;
+
+		String converted = values.length > 1 ? EText.c(prepaired + "[$0/$1]") : EText.c(prepaired + "[$0]");
+		int $ = 0;
+		for (final String dod : values) {
+			converted = converted.replace("$" + $, dod);
+			$++;
+		}
+
+		while (converted.contains("$" + $)) {
+			converted = converted.replace("$" + $, "");
+			$++;
+		}
+		return converted;
+	}
+
+	public static String getDurabilityString(Player p, EquipType eq) {
+		ItemStack stack = null;
+		switch (eq) {
+			case BOOTS:
+				stack = p.getInventory().getBoots();
+				break;
+			case CHESTPLATE:
+				stack = p.getInventory().getChestplate();
+				break;
+			case HAND:
+				stack = p.getInventory().getItemInMainHand();
+				break;
+			case HELMET:
+				stack = p.getInventory().getHelmet();
+				break;
+			case LEGGINGS:
+				stack = p.getInventory().getLeggings();
+				break;
+				/*
+				 * case OFF_HAND: stack = p.getInventory().getItemInOffHand(); break;
+				 */
+			default:
+				break;
+		}
+
+		return getDurabilityString(stack);
+	}
+
+	public static String getDurabilityString(ItemStack stack) {
+		if (stack == null || !ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return "0/0";
+		final List<String> lore = stack.getItemMeta().getLore();
+
+		final Pattern patt = DManager.checkDurabilityType(lore);
+		final String value = BasicMetaAdapter.getStringValue(patt, lore);
+		if (value.equalsIgnoreCase("")) return "0/0";
+
+		return value;
+	}
+
+}

@@ -1,0 +1,73 @@
+_someGeneralType:
+  #That Item not will added to Editor, allows you to make overall options for required item types.
+  material: AIR
+  #Currently "random" flag works only for repairable, cuz we don't has any another options to use random :D
+  repairable: 'random'
+  is-unbreakable: 'true'
+  item-flags:
+  - HIDE_ATTRIBUTES
+  - HIDE_DESTROYS
+  - HIDE_DYE
+  - HIDE_ENCHANTS
+  - HIDE_PLACED_ON
+  - HIDE_POTION_EFFECTS
+  - HIDE_UNBREAKABLE
+  type: ONE_HANDED
+  
+SomeItemTier0:
+  copy-from: '_someGeneralType'
+  material: WOODEN_SWORD
+  data: '5'
+  #You can randomise level!
+  level: 'from 1 to 10'
+  default-rarity: Common
+  display:
+    display-name: '&2SomeItemName'
+    lore:
+    - '&4Lore is Footer'
+    description:
+    - '&2Desc if Header'
+  #Currently you only can change max-durability, in future I planned to add "current-durability" option
+  #But it will works only if item repairable
+  max-durability: '200'
+  enchantments:
+  - DAMAGE_ALL:2
+  attributes:
+    physical_damage: 15.0-20.0
+    critical_chance: '+7'
+    max_health: -5%
+    dodge: '5'
+  random-attributes:
+    #If u set a static attribute, you available to increase it by percents value, 
+    #from 5% to 10% means the result damage can be between 15.75-21.0 and 16.5-22.0
+    #and this also will be scaled using item level!
+    #for example, level 5 item with 'per level 2.5' will has 'from 15% to 20%'
+    #NOTE! First level not calculated, 'per level' works only when item level greater than 1
+    physical_damage: 'from +5% to +10% per level 2.5'
+    #if u set chance for attribute, it will be rolled for item, it means with item has 65% chance to has this attribute
+    critical_chance: 'chance 65% from -15% to +15% per level 1.5'
+    #You are not allowed to use range percents! (ex. from 5-15% to 10-20%)
+
+SomeItemTier1:
+  #This item has both params from 'SomeItemTier0' and '_someGeneralType'
+  #NOTE! Items sorts by his key, if you try to copy options in 'SomeItemTier0' from 'SomeItemTier1' you get error.
+  #To correctly sort items for 'copy-from' you can use prefixes like: 'Tier0_', 'Tier1_', 'Tier2_'...
+  copy-from: 'SomeItemTier0'
+  #DONT TRY TO USE PER LEVEL HERE xD! IT WILL BREAK YOUR ITEM! (joke)
+  level: 'from 11 to 25'
+  #Yeah, per level also works for durability
+  max-durability: 'from 200 to 250 per level 5'
+  #You can add random rarities with chance. Nothing more for now. :)
+  #It works in correct logic, lowest chance will be processed first.
+  #NOTE! You may set default-rarity for first, here we use 'copy-from' and this item has default-rarity from 'SomeItemTier0'
+  random-rarity:
+    uncommon:
+      chance: 25.0
+    rare:
+      chance: 7.0
+    epic:
+      chance: 1.0
+  #You also can remove ALL (excepts material, item-flags, enchantments, lore, display-name) params from item.
+  #We used negative health 'SomeItemTier0
+  attributes:
+    max_health: remove
