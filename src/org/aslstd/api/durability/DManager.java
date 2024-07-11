@@ -5,28 +5,31 @@ import java.util.regex.Pattern;
 
 import org.aslstd.api.bukkit.equip.EquipSlot;
 import org.aslstd.api.bukkit.equip.EquipType;
-import org.aslstd.api.bukkit.events.equipment.EquipChangeEvent;
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.InventoryUtil;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
 import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.utils.BasicMetaAdapter;
-import org.aslstd.api.bukkit.value.util.NumUtil;
-import org.aslstd.core.Core;
+import org.aslstd.api.ejcore.event.equipment.PrepareEquipEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.utility.BasicMetaAdapter;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.InventoryUtil;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.value.util.NumUtil;
+import org.dxrgd.core.OpenLib;
+
+import net.kyori.adventure.text.Component;
 
 public class DManager { // Durability Manager
 
-	public static Pattern	repairableDurability	= Pattern.compile(EText.e(Core.getLang().NAME_DURABILITY.toLowerCase()) + ".?\\s\\[([-+]?\\d+\\/\\d+)\\]");
-	public static Pattern	nonRepairableDurability	= Pattern.compile(EText.e(Core.getLang().NAME_DURABILITY.toLowerCase()) + ".?\\s\\[([-+]?\\d+)\\]");
+	public static Pattern	repairableDurability	= Pattern.compile(Texts.e(OpenLib.lang().NAME_DURABILITY.toLowerCase()) + ".?\\s\\[([-+]?\\d+\\/\\d+)\\]");
+	public static Pattern	nonRepairableDurability	= Pattern.compile(Texts.e(OpenLib.lang().NAME_DURABILITY.toLowerCase()) + ".?\\s\\[([-+]?\\d+)\\]");
 
 	public static ItemStack changeDurability(ItemStack stack, int amount, int max) {
 		final Pattern patt = DManager.checkDurabilityType(stack);
 		if (patt == null) return stack;
-		final List<String> lore = stack.getItemMeta().getLore();
+		final List<Component> lore = stack.getItemMeta().lore();
 		final ItemMeta meta = stack.getItemMeta();
 
 		final int index = BasicMetaAdapter.indexOf(lore, patt);
@@ -41,27 +44,27 @@ public class DManager { // Durability Manager
 		if (value.length > 1) {
 			if (second <= 0)
 				second = NumUtil.parseInteger(value[1]);
-			lore.set(index, DManager.getDurabilityLore((first + amount) + "", second + ""));
+			lore.set(index, Component.text(DManager.getDurabilityLore((first + amount) + "", second + "")));
 		}
 
 		if (value.length == 1)
-			lore.set(index, DManager.getDurabilityLore((first + amount) + ""));
+			lore.set(index, Component.text(DManager.getDurabilityLore((first + amount) + "")));
 
-		meta.setLore(lore);
+		meta.lore(lore);
 		stack.setItemMeta(meta);
 		return stack;
 	}
 
 	public static Pattern checkDurabilityType(ItemStack stack) {
 		if (!ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return null;
-		else return checkDurabilityType(stack.getItemMeta().getLore());
+		else return checkDurabilityType(stack.getItemMeta().lore());
 	}
 
 	public static boolean isRepairable(ItemStack stack) {
 		return BasicMetaAdapter.contains(stack, repairableDurability);
 	}
 
-	public static Pattern checkDurabilityType(List<String> lore) {
+	public static Pattern checkDurabilityType(List<Component> lore) {
 		if (BasicMetaAdapter.contains(lore, DManager.repairableDurability)) return DManager.repairableDurability;
 		if (BasicMetaAdapter.contains(lore, DManager.nonRepairableDurability)) return DManager.nonRepairableDurability;
 		else return null;
@@ -81,9 +84,9 @@ public class DManager { // Durability Manager
 				if (NumUtil.parseInteger(val.split("/")[0]) < 1) {
 					armourSet[i] = null;
 
-					final EquipSlot slot = EquipSlot.byID(39-i);
+					final EquipSlot slot = EquipSlot.id(39-i);
 
-					Bukkit.getPluginManager().callEvent(new EquipChangeEvent(slot, null, p));
+					Bukkit.getPluginManager().callEvent(new PrepareEquipEvent(slot, null, p));
 				}
 		}
 
@@ -94,7 +97,7 @@ public class DManager { // Durability Manager
 	}
 
 	public static void decreaseDurability(Player p, EquipSlot slot, int amount) {
-		final ItemStack stack = EquipSlot.getStackFromSlot(slot, p);
+		final ItemStack stack = EquipSlot.get(slot, p);
 
 		if (!ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return;
 
@@ -107,16 +110,16 @@ public class DManager { // Durability Manager
 		if (NumUtil.parseInteger(value[0]) - amount <= 1) {
 			InventoryUtil.decreaseItemAmount(stack, p, 1);
 
-			Bukkit.getPluginManager().callEvent(new EquipChangeEvent(slot, null, p));
+			Bukkit.getPluginManager().callEvent(new PrepareEquipEvent(slot, null, p));
 		}
 		else DManager.changeDurability(stack, amount, 0);
 
 	}
 
 	public static String getDurabilityLore(String... values) {
-		final String prepaired = Core.getLang().NAME_DURABILITY + ": " + Core.getLang().DURABILITY_SUFFIX_COLOR_DECORATOR;
+		final String prepaired = OpenLib.lang().NAME_DURABILITY + ": " + OpenLib.lang().DURABILITY_SUFFIX_COLOR_DECORATOR;
 
-		String converted = values.length > 1 ? EText.c(prepaired + "[$0/$1]") : EText.c(prepaired + "[$0]");
+		String converted = values.length > 1 ? Texts.c(prepaired + "[$0/$1]") : EText.c(prepaired + "[$0]");
 		int $ = 0;
 		for (final String dod : values) {
 			converted = converted.replace("$" + $, dod);
@@ -160,7 +163,7 @@ public class DManager { // Durability Manager
 
 	public static String getDurabilityString(ItemStack stack) {
 		if (stack == null || !ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return "0/0";
-		final List<String> lore = stack.getItemMeta().getLore();
+		final List<Component> lore = stack.getItemMeta().lore();
 
 		final Pattern patt = DManager.checkDurabilityType(lore);
 		final String value = BasicMetaAdapter.getStringValue(patt, lore);

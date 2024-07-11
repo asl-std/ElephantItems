@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.yaml.YAML;
 import org.aslstd.ei.EI;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
 
 public class ItemManager {
 
@@ -24,8 +24,8 @@ public class ItemManager {
 				if (file.listFiles().length > 0) files.addAll(Arrays.asList(file.listFiles()));
 
 			} else
-				if (YAML.getFileExtension(file).equals("yml")) {
-					final YAML util = new YAML(file);
+				if (Yaml.getFileExtension(file).equals("yml")) {
+					final Yaml util = new Yaml(file);
 					if (util.getKeys(false).size() > 0)
 						for (final String section : util.getKeys(false)) {
 
@@ -47,14 +47,14 @@ public class ItemManager {
 		for (final ESimpleItem item : items) {
 
 			final String section = item.getKey();
-			final YAML util = item.getFile();
+			final Yaml util = item.getFile();
 
 			if (util.contains(section + ".copy-from")) {
 				final String copyFrom = util.getString(section + ".copy-from");
 				final ESimpleItem from = ESimpleItem.getById(copyFrom);
 
 				if (from == null) {
-					EText.warn("CANT COPY PARAMETERS FROM " + copyFrom + " FOR ITEM " + item.getKey()
+					Texts.warn("CANT COPY PARAMETERS FROM " + copyFrom + " FOR ITEM " + item.getKey()
 					+ " BECAUSE IT NOT EXIST, THIS ITEM SKIPPED", "EI");
 					continue;
 				}

@@ -1,25 +1,27 @@
 package org.aslstd.ei.listener;
 
 import org.aslstd.api.CustomParams;
-import org.aslstd.api.bukkit.entity.EPlayer;
 import org.aslstd.api.bukkit.equip.EquipSlot;
-import org.aslstd.api.bukkit.events.equipment.EquipChangeEvent;
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.InventoryUtil;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
+import org.aslstd.api.ejcore.event.equipment.PrepareEquipEvent;
 import org.aslstd.api.entity.RPGPlayer;
 import org.aslstd.api.item.ItemType;
-import org.aslstd.core.Core;
 import org.aslstd.ei.EI;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.InventoryUtil;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.player.OPlayer;
+import org.dxrgd.api.open.plugin.listener.BukkitListener;
+import org.dxrgd.api.open.plugin.listener.Named;
+import org.dxrgd.core.OpenLib;
 
-public class InventoryChangeListener implements Listener {
+@Named(key = "inventoryCheckEvent")
+public class InventoryChangeListener implements BukkitListener {
 
 	@EventHandler
 	public void onHandsSwap(PlayerSwapHandItemsEvent e) {
@@ -27,7 +29,7 @@ public class InventoryChangeListener implements Listener {
 
 			@Override
 			public void run() {
-				final EPlayer p = EPlayer.getEPlayer(e.getPlayer());
+				final OPlayer p = OPlayer.stash().get(e.getPlayer().getUniqueId());
 				ItemStack hand = e.getPlayer().getInventory().getItemInMainHand(),
 						offhand = e.getPlayer().getInventory().getItemInOffHand();
 
@@ -69,26 +71,26 @@ public class InventoryChangeListener implements Listener {
 
 				if (hand != null) {
 					if ((thand == ItemType.ONE_HANDED) || (thand == ItemType.TWO_HANDED) || (thand == ItemType.SHIELD)) {
-						p.equip(EquipSlot.HAND, hand);
+						p.equip().set(EquipSlot.HAND, hand);
 						RPGPlayer.calculateEquip(p, EquipSlot.HAND);
 					}
 				} else p.removeEquip(EquipSlot.HAND);
 
 				if (offhand != null) {
 					if ((thand == ItemType.ONE_HANDED) || (thand == ItemType.SHIELD)) {
-						p.equip(EquipSlot.OFF, offhand);
+						p.set(EquipSlot.OFF, offhand);
 						RPGPlayer.calculateEquip(p, EquipSlot.OFF);
 					}
 				} else p.removeEquip(EquipSlot.OFF);
 
 				p.updateStats();
 			}
-		}.runTaskAsynchronously(Core.instance());
+		}.runTaskAsynchronously(OpenLib.instance());
 	}
 
 	@EventHandler
-	public void onEquipPrepare(EquipChangeEvent e) {
-		final EPlayer p = EPlayer.getEPlayer(e.getPlayer());
+	public void onEquipPrepare(PrepareEquipEvent e) {
+		final OPlayer p = OPlayer.stash().get(e.getPlayer().getUniqueId());
 		final ItemStack stack = e.getItemStack();
 
 		new BukkitRunnable() {
@@ -129,7 +131,7 @@ public class InventoryChangeListener implements Listener {
 
 					if (stack != null) {
 						if ((type == ItemType.ONE_HANDED) || ((eq == EquipSlot.HAND) && (type == ItemType.TWO_HANDED)) || (type == ItemType.SHIELD)) {
-							p.equip(e.getEquipSlot(), stack);
+							p.set(e.getEquipSlot(), stack);
 							RPGPlayer.calculateEquip(p, eq);
 						}
 					} else p.removeEquip(e.getEquipSlot());
@@ -154,14 +156,14 @@ public class InventoryChangeListener implements Listener {
 				}
 
 				if (stack != null) {
-					p.equip(e.getEquipSlot(), stack);
+					p.set(e.getEquipSlot(), stack);
 
 					RPGPlayer.calculateEquip(p, e.getEquipSlot());
 				} else p.removeEquip(e.getEquipSlot());
 
 			}
 
-		}.runTaskAsynchronously(Core.instance());
+		}.runTaskAsynchronously(OpenLib.instance());
 	}
 
 	@EventHandler
@@ -177,7 +179,7 @@ public class InventoryChangeListener implements Listener {
 				cancel();
 			}
 
-		}.runTaskTimer(Core.instance(), 1L, 2L);
+		}.runTaskTimer(OpenLib.instance(), 1L, 2L);
 	}
 
 }

@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.settings.StringSettings;
-import org.aslstd.api.bukkit.value.ModifierType;
-import org.aslstd.api.bukkit.value.Value;
-import org.aslstd.api.bukkit.value.util.NumUtil;
-import org.aslstd.api.bukkit.yaml.YAML;
 import org.aslstd.ei.EI;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
+import org.dxrgd.api.open.value.ModifierType;
+import org.dxrgd.api.open.value.Value;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class RepairMaterial extends ItemStack {
 
 	private static ConcurrentMap<String, RepairMaterial> materials = new ConcurrentHashMap<>();
 
-	public static final YAML MATERIALS_DB = new YAML(EI.instance().getDataFolder() + "/repair-materials.yml", EI.instance());
+	public static final Yaml MATERIALS_DB = new Yaml(EI.instance().getDataFolder() + "/repair-materials.yml", EI.instance());
 
 	public static RepairMaterial getMaterial(String key) {
 		return materials.get(key.toLowerCase());
@@ -63,22 +63,22 @@ public class RepairMaterial extends ItemStack {
 	@Getter private String key;
 	private ItemMeta meta;
 
-	private StringSettings settings;
+	private FileSettings settings;
 
 	@Getter private Value repairValue;
 	@Getter private int repairCost;
 
 	public RepairMaterial(String key) {
 		super(Material.STICK);
-		settings = new StringSettings();
-		settings.importFromYAML(MATERIALS_DB, key);
+		settings = new FileSettings();
+		settings.importYaml(MATERIALS_DB, key);
 		this.key = key;
 		meta = getItemMeta();
 
 		setMaterial(settings.getValue("material"))
 		.setData(settings.getValue("data"))
 		.setDisplayName(settings.getValue("display.name"))
-		.setLore(settings.exportArray("display.lore"));
+		.writeLore(settings.exportArray("display.lore"));
 
 		repairCost = NumUtil.parseInteger(settings.getValue("cost-levels"));
 
@@ -86,13 +86,13 @@ public class RepairMaterial extends ItemStack {
 		repairValue = new Value(value, ModifierType.getFromValue(value));
 	}
 
-	public RepairMaterial setLore(List<String> prepaired) {
+	public RepairMaterial writeLore(List<String> prepaired) {
 		if (prepaired == null || prepaired.isEmpty()) return this;
 
 		final List<String> lore = new ArrayList<>();
 
 		for (final String prep : prepaired)
-			if (prep != null) lore.add(EText.c(prep));
+			if (prep != null) lore.add(Texts.c(prep));
 
 		meta.setLore(lore);
 		setItemMeta(meta);
@@ -116,7 +116,7 @@ public class RepairMaterial extends ItemStack {
 	public RepairMaterial setDisplayName(String displayName) {
 		if (displayName == null) return this;
 
-		meta.setDisplayName(EText.c(displayName));
+		meta.setDisplayName(Texts.c(displayName));
 
 		setItemMeta(meta);
 		return this;
@@ -124,7 +124,7 @@ public class RepairMaterial extends ItemStack {
 
 	public RepairMaterial setMaterial(String material) {
 		if (material == null) {
-			EText.warn("&4Incorrect Material for key:&a'" + key, EI.prefix);
+			Texts.warn("&4Incorrect Material for key:&a'" + key, EI.prefix);
 			return this;
 		}
 

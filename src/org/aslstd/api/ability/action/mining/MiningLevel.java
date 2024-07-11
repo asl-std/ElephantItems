@@ -37,18 +37,18 @@ public class MiningLevel {
 
 		switch(stack.getType()) {
 
-		case NETHERITE_PICKAXE:
-		case DIAMOND_PICKAXE:
-			return LEVEL_3.materials;
-		case IRON_PICKAXE:
-			return LEVEL_2.materials;
-		case STONE_PICKAXE:
-		case GOLDEN_PICKAXE:
-			return LEVEL_1.materials;
-		case WOODEN_PICKAXE:
-			return LEVEL_0.materials;
-		default:
-			return null;
+			case NETHERITE_PICKAXE:
+			case DIAMOND_PICKAXE:
+				return LEVEL_3.materials;
+			case IRON_PICKAXE:
+				return LEVEL_2.materials;
+			case STONE_PICKAXE:
+			case GOLDEN_PICKAXE:
+				return LEVEL_1.materials;
+			case WOODEN_PICKAXE:
+				return LEVEL_0.materials;
+			default:
+				return null;
 		}
 
 	}

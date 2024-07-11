@@ -6,10 +6,6 @@ import java.util.List;
 import org.aslstd.api.ability.BasicAction;
 import org.aslstd.api.ability.action.mining.MiningBlockEvent;
 import org.aslstd.api.ability.action.mining.MiningLevel;
-import org.aslstd.api.bukkit.blocks.BlockUtil;
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.settings.StringSettings;
-import org.aslstd.api.bukkit.value.util.NumUtil;
 import org.aslstd.ei.EI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -18,6 +14,10 @@ import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
+import org.dxrgd.api.bukkit.utility.BlockUtil;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 public class MiningAction extends BasicAction {
 
@@ -33,8 +33,8 @@ public class MiningAction extends BasicAction {
 	}
 
 	@Override
-	public void acceptSettings(StringSettings settings) {
-		if (!settings.hasKey("settings.radius")) { EText.warn("Mining action has incorrect settings"); return; }
+	public void acceptSettings(FileSettings settings) {
+		if (!settings.hasKey("settings.radius")) { Texts.warn("Mining action has incorrect settings"); return; }
 
 		radius = NumUtil.parseInteger(settings.getValue("settings.radius"));
 
@@ -47,7 +47,7 @@ public class MiningAction extends BasicAction {
 			final Material mat = Material.matchMaterial(param);
 
 			if (mat == null)
-				EText.warn("Incorrect material in blocked-blocks-list provided: " + param);
+				Texts.warn("Incorrect material in blocked-blocks-list provided: " + param);
 			else
 				blockedBlocks.add(mat);
 		}

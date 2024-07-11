@@ -2,8 +2,8 @@ package org.aslstd.ei.config.conversion;
 
 import java.util.List;
 
-import org.aslstd.api.bukkit.value.Pair;
-import org.aslstd.api.bukkit.value.util.NumUtil;
+import org.dxrgd.api.open.value.Pair;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 import lombok.Getter;
 

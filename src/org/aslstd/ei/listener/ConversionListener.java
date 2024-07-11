@@ -4,16 +4,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.InventoryUtil;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
 import org.aslstd.ei.EI;
 import org.aslstd.ei.config.ConvertConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,8 +19,14 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.SmithingInventory;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.InventoryUtil;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.plugin.listener.BukkitListener;
+import org.dxrgd.api.open.plugin.listener.Named;
 
-public class ConversionListener implements Listener {
+@Named(key = "conversion")
+public class ConversionListener implements BukkitListener {
 
 	private static final Map<UUID, ItemStack> invisibleItem = new ConcurrentHashMap<>();
 

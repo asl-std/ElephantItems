@@ -1,16 +1,16 @@
 package org.aslstd.api.item.interfaze;
 
-import org.aslstd.api.bukkit.settings.StringSettings;
-import org.aslstd.api.bukkit.yaml.YAML;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
 
 public interface EItem {
 
 	ItemStack toStack();
 
-	StringSettings getSettings();
+	FileSettings getSettings();
 
-	YAML getFile();
+	Yaml getFile();
 
 	String getKey();
 

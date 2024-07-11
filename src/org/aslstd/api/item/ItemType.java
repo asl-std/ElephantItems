@@ -1,7 +1,7 @@
 package org.aslstd.api.item;
 
-import org.aslstd.api.bukkit.message.EText;
 import org.aslstd.ei.EI;
+import org.dxrgd.api.bukkit.message.Texts;
 
 import lombok.Getter;
 
@@ -23,13 +23,13 @@ public enum ItemType {
 
 	public static boolean isArmor(ItemType type) {
 		switch(type) {
-		case ARMOR_HELMET:
-		case ARMOR_CHESTPLATE:
-		case ARMOR_LEGGINGS:
-		case ARMOR_BOOTS:
-			return true;
-		default:
-			return false;
+			case ARMOR_HELMET:
+			case ARMOR_CHESTPLATE:
+			case ARMOR_LEGGINGS:
+			case ARMOR_BOOTS:
+				return true;
+			default:
+				return false;
 		}
 	}
 
@@ -37,7 +37,7 @@ public enum ItemType {
 		if (value == null)  return null;
 
 		for (final ItemType type : values())
-			if (type.name().equalsIgnoreCase(value) || EText.e(type.getVisualName()).equalsIgnoreCase(EText.e(value)))
+			if (type.name().equalsIgnoreCase(value) || Texts.e(type.getVisualName()).equalsIgnoreCase(Texts.e(value)))
 				return type;
 
 		return null;

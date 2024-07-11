@@ -6,8 +6,6 @@ import org.aslstd.api.CustomParams;
 import org.aslstd.api.ability.AbilityType;
 import org.aslstd.api.ability.EAbility;
 import org.aslstd.api.bukkit.equip.EquipSlot;
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
 import org.aslstd.api.durability.DManager;
 import org.aslstd.api.item.ESimpleItem;
 import org.aslstd.api.item.ItemType;
@@ -19,7 +17,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
@@ -27,10 +24,15 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.plugin.listener.BukkitListener;
+import org.dxrgd.api.open.plugin.listener.Named;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
-public class ToolUsingListener implements Listener {
+@Named(key = "toolsUsing")
+public class ToolUsingListener implements BukkitListener {
 
 	public void processAbilities(ItemStack stack, Event e) {
 		final NBTItem item = new NBTItem(stack);

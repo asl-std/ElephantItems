@@ -1,15 +1,15 @@
 package org.aslstd.ei.config;
 
-import org.aslstd.api.bukkit.yaml.EJConf;
-import org.aslstd.api.ejcore.plugin.EJPlugin;
+import org.dxrgd.api.open.file.configuration.OConf;
+import org.dxrgd.api.open.plugin.OPlugin;
 
-public class LangConfig extends EJConf {
+public class LangConfig extends OConf {
 
 	public String HEADER_ATTR, HEADER_DESC, HEADER_LORE, NAME_LEVEL, NAME_RARITY;
 
 	public String TYPE_ONE_HANDED, TYPE_TWO_HANDED, TYPE_ARMOR_HELMET, TYPE_ARMOR_CHESTPLATE, TYPE_ARMOR_LEGGINGS, TYPE_ARMOR_BOOTS, TYPE_TOOL, TYPE_SHIELD;
 
-	public LangConfig(String file, EJPlugin plugin) {
+	public LangConfig(String file, OPlugin plugin) {
 		super(file, plugin);
 	}
 

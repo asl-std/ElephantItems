@@ -1,10 +1,10 @@
 package org.aslstd.api.durability;
 
-import org.aslstd.api.bukkit.value.Pair;
-import org.aslstd.api.bukkit.value.util.MathUtil;
-import org.aslstd.api.bukkit.value.util.NumUtil;
 import org.aslstd.api.durability.material.RepairMaterial;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.open.value.Pair;
+import org.dxrgd.api.open.value.util.MathUtil;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,7 +36,7 @@ public class RepairParams {
 
 		if (repair >= max) return;
 
-		if (material.getRepairValue().getType().isPercents())
+		if (material.getRepairValue().getType().isPercent())
 			repair = (int) MathUtil.getPercentsOfValue(NumUtil.parseDouble(material.getRepairValue().getValue()), max);
 		else
 			repair = NumUtil.parseDouble(material.getRepairValue().getValue()).intValue();

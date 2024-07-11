@@ -3,11 +3,11 @@ package org.aslstd.api.rarity;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.aslstd.api.attributes.BasicAttr;
-import org.aslstd.api.attributes.managers.WAttributes;
-import org.aslstd.api.bukkit.value.ModifierType;
-import org.aslstd.api.bukkit.value.util.NumUtil;
-import org.aslstd.api.bukkit.yaml.YAML;
+import org.aslstd.api.attributes.AttrBase;
+import org.aslstd.api.attributes.AttrManager;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
+import org.dxrgd.api.open.value.ModifierType;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 import lombok.Getter;
 
@@ -23,7 +23,7 @@ public class ERarity {
 	@Getter private String key;
 	@Getter private String visualName;
 
-	public ERarity(String key, YAML file) {
+	public ERarity(String key, Yaml file) {
 		this.key = key;
 		visualName = file.getString("visual-name");
 
@@ -42,7 +42,7 @@ public class ERarity {
 		for (final String str : file.getSection("upgrade.percent-stats").getKeys(false)) {
 			if (str.equalsIgnoreCase("all-stats")) continue;
 
-			final BasicAttr attr = WAttributes.getByKey(str);
+			final AttrBase attr = AttrManager.getByKey(str);
 			if (attr != null) {
 				upgradeValues.put("percent-" + attr.getKey(), file.getString("upgrade.percent-stats." + str));
 			}
@@ -51,7 +51,7 @@ public class ERarity {
 		for (final String str : file.getSection("upgrade.value-stats").getKeys(false)) {
 			if (str.equalsIgnoreCase("all-stats")) continue;
 
-			final BasicAttr attr = WAttributes.getByKey(str);
+			final AttrBase attr = AttrManager.getByKey(str);
 			if (attr != null) {
 				upgradeValues.put("value-" + attr.getKey(), file.getString("value.percent-stats." + str));
 			}

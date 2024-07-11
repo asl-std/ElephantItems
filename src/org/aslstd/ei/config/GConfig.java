@@ -3,19 +3,19 @@ package org.aslstd.ei.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.value.util.NumUtil;
-import org.aslstd.api.bukkit.yaml.EJConf;
-import org.aslstd.api.ejcore.plugin.EJPlugin;
 import org.aslstd.ei.EI;
 import org.bukkit.Material;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.open.file.configuration.OConf;
+import org.dxrgd.api.open.plugin.OPlugin;
+import org.dxrgd.api.open.value.util.NumUtil;
 
-public class GConfig extends EJConf {
+public class GConfig extends OConf {
 
 	public boolean TYPE_RESTRICT, LEVEL_RESTRICT, USE_VANILLA_DMG;
 	public int MAX_ITEM_UPGRADES;
 
-	public GConfig(String file, EJPlugin plugin) {
+	public GConfig(String file, OPlugin plugin) {
 		super(file, plugin);
 	}
 
@@ -46,7 +46,7 @@ public class GConfig extends EJConf {
 						final String[] range = element.split("-");
 						int start = NumUtil.parseInteger(range[0]);
 						if (start < 1) {
-							EText.warn("Don't use negative values for CustomModelData! | " + key + ":" + start );
+							Texts.warn("Don't use negative values for CustomModelData! | " + key + ":" + start );
 							continue;
 						}
 						final int end = NumUtil.parseInteger(range[1]);
@@ -55,7 +55,7 @@ public class GConfig extends EJConf {
 					} else {
 						final int value = NumUtil.parseInteger(element);
 						if (value < 1) {
-							EText.warn("Don't use negative values for CustomModelData! | " + key + ":" + value );
+							Texts.warn("Don't use negative values for CustomModelData! | " + key + ":" + value );
 							continue;
 						}
 						cmds.add(value);
@@ -63,7 +63,7 @@ public class GConfig extends EJConf {
 				}
 				EI.predefined.put(mat, cmds);
 			} else
-				EText.warn("Predefined custom model data: " + key + " has incorrect material");
+				Texts.warn("Predefined custom model data: " + key + " has incorrect material");
 		}
 
 		for (final String key : getStringList("ranged-weapon"))

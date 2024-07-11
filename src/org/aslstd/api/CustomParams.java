@@ -1,10 +1,10 @@
 package org.aslstd.api;
 
-import org.aslstd.api.bukkit.value.CustomParam;
-import org.aslstd.api.bukkit.value.util.NumUtil;
 import org.aslstd.api.item.ItemType;
 import org.aslstd.api.rarity.RarityManager;
 import org.aslstd.ei.EI;
+import org.dxrgd.api.open.value.CustomParam;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 public class CustomParams {
 

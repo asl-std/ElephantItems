@@ -11,23 +11,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.aslstd.api.CustomParams;
 import org.aslstd.api.ability.EAbility;
+import org.aslstd.api.attributes.AttrBase;
+import org.aslstd.api.attributes.AttrManager;
 import org.aslstd.api.attributes.AttrType;
-import org.aslstd.api.attributes.BasicAttr;
-import org.aslstd.api.attributes.managers.WAttributes;
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.settings.StringSettings;
-import org.aslstd.api.bukkit.utils.BasicMetaAdapter;
-import org.aslstd.api.bukkit.value.ModifierType;
-import org.aslstd.api.bukkit.value.Pair;
-import org.aslstd.api.bukkit.value.Value;
-import org.aslstd.api.bukkit.value.random.RandomBool;
-import org.aslstd.api.bukkit.value.random.RandomVal;
-import org.aslstd.api.bukkit.value.util.MathUtil;
-import org.aslstd.api.bukkit.value.util.NumUtil;
-import org.aslstd.api.bukkit.value.util.ValueParser;
-import org.aslstd.api.bukkit.yaml.YAML;
 import org.aslstd.api.durability.DManager;
 import org.aslstd.api.item.interfaze.EItem;
 import org.aslstd.api.rarity.ERarity;
@@ -40,6 +26,20 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
+import org.dxrgd.api.bukkit.utility.BasicMetaAdapter;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
+import org.dxrgd.api.open.value.ModifierType;
+import org.dxrgd.api.open.value.Pair;
+import org.dxrgd.api.open.value.Value;
+import org.dxrgd.api.open.value.random.RandomBool;
+import org.dxrgd.api.open.value.random.RandomVal;
+import org.dxrgd.api.open.value.util.MathUtil;
+import org.dxrgd.api.open.value.util.NumUtil;
+import org.dxrgd.api.open.value.util.ValueParser;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
@@ -63,17 +63,17 @@ public final class ESimpleItem extends ItemStack implements EItem {
 		if (!ItemStackUtil.validate(stack, IStatus.HAS_LORE)) return false;
 		List<String> lore;
 		if ((lore = stack.getItemMeta().getLore()) == null) return false;
-		for (final BasicAttr stat : WAttributes.getRegistered())
-			if (BasicMetaAdapter.contains(lore, BasicAttr.getRegexPattern(stat))) return true;
+		for (final AttrBase stat : AttrManager.getAttributes())
+			if (BasicMetaAdapter.contains(lore, AttrBase.getRegexPattern(stat))) return true;
 		return false;
 	}
 
-	@Getter protected final StringSettings 	settings;
+	@Getter protected final FileSettings 	settings;
 	@Getter private final ConcurrentMap<String,RandomVal> random;
 	@Getter private RandomRarity 			randomRarity;
 
 	@Getter public final String 			key;
-	@Getter private final YAML				file;
+	@Getter private final Yaml				file;
 	protected ItemMeta						meta;
 	public boolean 							isUnbreakable, isRepairable;
 	public boolean[] 						hasAttr;
@@ -88,7 +88,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 	@Getter protected List<EAbility> abilities;
 
 	public void build() {
-		settings.importFromYAML(file, key);
+		settings.importYaml(file, key);
 
 		isUnbreakable = Boolean.parseBoolean(settings.getValue("is-unbreakable-flag"));
 
@@ -121,9 +121,9 @@ public final class ESimpleItem extends ItemStack implements EItem {
 		return this;
 	}
 
-	public ESimpleItem(YAML util, String section) {
+	public ESimpleItem(Yaml util, String section) {
 		super(new ItemStack(Material.matchMaterial("IRON_SWORD")));
-		settings = new StringSettings();
+		settings = new FileSettings();
 		file = util;
 		key = section;
 		desc = new ArrayList<>();
@@ -131,16 +131,16 @@ public final class ESimpleItem extends ItemStack implements EItem {
 		lore = new ArrayList<>();
 		abilities = new ArrayList<>();
 		random = new ConcurrentHashMap<>();
-		hasAttr = new boolean[WAttributes.getRegistered().size()];
+		hasAttr = new boolean[AttrManager.getAttributes().size()];
 
 		if (getById(section.toLowerCase()) != null) {
-			EText.warn("ITEM WITH ID &a" + section + " NOW EXISTS", EI.prefix);
+			Texts.warn("ITEM WITH ID &a" + section + " NOW EXISTS", EI.prefix);
 		}
 	}
 
 	public ESimpleItem setRandomAttributes() {
 		for (final Entry<String,RandomVal> entry : random.entrySet()) {
-			final BasicAttr stat = WAttributes.getByKey(entry.getKey());
+			final AttrBase stat = AttrManager.getByKey(entry.getKey());
 			if (stat == null || hasAttr[stat.getUniquePosition()]) continue;
 
 			String[] split = new String[] { "" };
@@ -166,19 +166,19 @@ public final class ESimpleItem extends ItemStack implements EItem {
 				else
 					single = true;
 			} catch (final NumberFormatException e) {
-				EText.warn("&4STAT IS BROKEN :&e" + getKey() + ":" + entry.getKey() + "&4, SKIPPED", EI.prefix);
+				Texts.warn("&4STAT IS BROKEN :&e" + getKey() + ":" + entry.getKey() + "&4, SKIPPED", EI.prefix);
 				continue;
 			}
 
 			double fResultValue = NumUtil.parseDouble(split[0]);
 
 			if (single)
-				attributes.add( EText.c( stat.convertToLore( dot, EText.df.format(fResultValue), percent ? "%" : "" ) ) );
+				attributes.add( Texts.c( stat.convertToLore( dot, Texts.df.format(fResultValue), percent ? "%" : "" ) ) );
 			else {
 				split = value.split("-");
 				fResultValue = NumUtil.parseDouble(split[0]);
 				final double sResultValue = NumUtil.parseDouble(split[1]);
-				attributes.add( EText.c( stat.convertToLore( dot, EText.df.format(fResultValue), "-", EText.df.format(sResultValue), percent ? "%" : "" ) ) );
+				attributes.add( Texts.c( stat.convertToLore( dot, Texts.df.format(fResultValue), "-", Texts.df.format(sResultValue), percent ? "%" : "" ) ) );
 			}
 		}
 
@@ -190,7 +190,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 		attributes.clear();
 
 		for (final Entry<String,String> key: attrSet) {
-			final BasicAttr stat = WAttributes.getByKey(key.getKey().substring(11));
+			final AttrBase stat = AttrManager.getByKey(key.getKey().substring(11));
 			if (stat == null) continue;
 
 			String[] split = new String[] { "" };
@@ -214,7 +214,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 				else
 					single = true;
 			} catch (final NumberFormatException e) {
-				EText.warn("&4ATTRIBUTE IS BROKEN :&e" + getKey() + ":" + key.getKey().substring(6) + "&4, SKIPPED", EI.prefix);
+				Texts.warn("&4ATTRIBUTE IS BROKEN :&e" + getKey() + ":" + key.getKey().substring(6) + "&4, SKIPPED", EI.prefix);
 				continue;
 			}
 
@@ -256,12 +256,12 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 			hasAttr[stat.getUniquePosition()] = true;
 			if (single)
-				attributes.add( EText.c( stat.convertToLore( dot, EText.df.format(fResultValue), percent ? "%" : "" ) ) );
+				attributes.add( Texts.c( stat.convertToLore( dot, Texts.df.format(fResultValue), percent ? "%" : "" ) ) );
 			else {
 				split = value.split("-");
 				fResultValue = NumUtil.parseDouble(split[0]);
 				final double sResultValue = NumUtil.parseDouble(split[1]);
-				attributes.add( EText.c( stat.convertToLore( dot, EText.df.format(fResultValue), "-", EText.df.format(sResultValue), percent ? "%" : "" ) ) );
+				attributes.add( Texts.c( stat.convertToLore( dot, Texts.df.format(fResultValue), "-", Texts.df.format(sResultValue), percent ? "%" : "" ) ) );
 			}
 		}
 
@@ -275,7 +275,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 				if (str.getValue().startsWith("from")) {
 					final RandomVal val = ValueParser.getSingleValue(str.getValue());
 					if (val == null) {
-						EText.warn("Some trouble happens with item: " + getKey() + " check level line.");
+						Texts.warn("Some trouble happens with item: " + getKey() + " check level line.");
 						continue;
 					}
 
@@ -294,7 +294,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 			if (str.getKey().startsWith("random-rarity")) {
 				if (!getSettings().hasKey("default-rarity")) {
-					EText.warn("You can't add 'random-rarity' without 'default-rarity'! Rarity initialisation skipped for item: " + key);
+					Texts.warn("You can't add 'random-rarity' without 'default-rarity'! Rarity initialisation skipped for item: " + key);
 					continue;
 				}
 
@@ -303,7 +303,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 					if (rar.getKey().contains("chance")) continue;
 					final ERarity rarity = RarityManager.getById(rar.getValue().substring(14));
 					if (rarity == null) {
-						EText.warn("Unknown rarity type: " + rar, "EI");
+						Texts.warn("Unknown rarity type: " + rar, "EI");
 						continue;
 					}
 					list.add( new Pair<>(rarity, NumUtil.parseDouble(getSettings().getValue(rar.getKey() + ".chance")) ));
@@ -319,7 +319,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 				if (str.getValue().startsWith("from")) {
 					final RandomVal val = ValueParser.getSingleValue(str.getValue());
 					if (val == null) {
-						EText.warn("Some trouble happens with item: " + getKey() + " check max durability line.");
+						Texts.warn("Some trouble happens with item: " + getKey() + " check max durability line.");
 						continue;
 					}
 					random.put("max-durability", ValueParser.getSingleValue(str.getValue()));
@@ -330,12 +330,12 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 			if (str.getKey().startsWith("random-attributes")) {
 				for (final Entry<String, String> attr : getSettings().getKey("random-attributes")) {
-					if (WAttributes.getByKey(attr.getKey().substring(18)) == null) continue;
+					if (AttrManager.getByKey(attr.getKey().substring(18)) == null) continue;
 
 					final RandomVal val = ValueParser.getRandomValue(attr.getValue());
 
 					if (val == null) {
-						EText.warn("Some trouble happens with item: " + getKey() + " check attribute:  " + attr.getKey().substring(18).toUpperCase() + " line.");
+						Texts.warn("Some trouble happens with item: " + getKey() + " check attribute:  " + attr.getKey().substring(18).toUpperCase() + " line.");
 						continue;
 					}
 
@@ -361,18 +361,18 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 		if (!desc.isEmpty())
 			if (EI.getLang().HEADER_DESC != null && !EI.getLang().HEADER_DESC.equalsIgnoreCase("")) {
-				description.add(EText.c(EI.getLang().HEADER_DESC));
+				description.add(Texts.c(EI.getLang().HEADER_DESC));
 
 				for (final String s : desc)
-					description.add(EText.c(s));
+					description.add(Texts.c(s));
 			}
 
 		if (!attributes.isEmpty())
 			if (EI.getLang().HEADER_ATTR != null && !EI.getLang().HEADER_ATTR.equalsIgnoreCase("")) {
-				description.add(EText.c(EI.getLang().HEADER_ATTR));
+				description.add(Texts.c(EI.getLang().HEADER_ATTR));
 
 				for (final String s : attributes)
-					description.add(EText.c(s));
+					description.add(Texts.c(s));
 			}
 
 		boolean loreEmpty = lore.isEmpty();
@@ -385,7 +385,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 		if (!loreEmpty)
 			if (EI.getLang().HEADER_LORE != null && !EI.getLang().HEADER_LORE.equalsIgnoreCase("")) {
-				description.add(EText.c(EI.getLang().HEADER_LORE));
+				description.add(Texts.c(EI.getLang().HEADER_LORE));
 
 
 				for (final EAbility ability : abilities)
@@ -394,7 +394,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 				if (!lore.isEmpty())
 					for (final String s : lore)
-						description.add(EText.c(s));
+						description.add(Texts.c(s));
 			}
 
 		meta.setLore(description);
@@ -417,7 +417,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 	public ESimpleItem setDisplayName(String displayName) {
 		if (displayName == null) return this;
 
-		meta.setDisplayName(EText.c(displayName));
+		meta.setDisplayName(Texts.c(displayName));
 
 		setItemMeta(meta);
 		return this;
@@ -439,8 +439,8 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 		if (c < 1) return this;
 
-		if (isRepairable) desc.add(EText.c( DManager.getDurabilityLore( String.valueOf(c), String.valueOf(c) ) ));
-		else desc.add(EText.c(DManager.getDurabilityLore(String.valueOf(c))));
+		if (isRepairable) desc.add(Texts.c( DManager.getDurabilityLore( String.valueOf(c), String.valueOf(c) ) ));
+		else desc.add(Texts.c(DManager.getDurabilityLore(String.valueOf(c))));
 
 		return this;
 	}
@@ -472,7 +472,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 		return this;
 	}
 
-	public void changeAttr(final BasicAttr attr, String value) {
+	public void changeAttr(final AttrBase attr, String value) {
 		final double[] values = new double[2] ;
 		final boolean isPercents = value.contains("%");
 		value = value.replaceAll("[%]?", "");
@@ -488,15 +488,15 @@ public final class ESimpleItem extends ItemStack implements EItem {
 		}
 
 		if (attr.getType() == AttrType.RANGE && values.length > 1 && values[1] != 0 && values[1] >= values[0])
-			settings.setValue("attributes." + attr.getKey().toLowerCase(), EText.df.format(values[0]) + "-" + EText.df.format(values[1]) + (isPercents ? "%" : ""));
+			settings.setValue("attributes." + attr.getKey().toLowerCase(), Texts.df.format(values[0]) + "-" + Texts.df.format(values[1]) + (isPercents ? "%" : ""));
 		else
-			settings.setValue("attributes." + attr.getKey().toLowerCase(), EText.df.format(NumUtil.parseDouble(value)) + (isPercents ? "%" : ""));
+			settings.setValue("attributes." + attr.getKey().toLowerCase(), Texts.df.format(NumUtil.parseDouble(value)) + (isPercents ? "%" : ""));
 
 		setAttributes(settings.getKey("attributes"));
 		processDescription();
 	}
 
-	public void removeAttr(final BasicAttr stat, boolean random) {
+	public void removeAttr(final AttrBase stat, boolean random) {
 		if (random) {
 			if (settings.hasKey("random-attributes." + stat.getKey().toLowerCase())) {
 				settings.remove("random-attributes." + stat.getKey().toLowerCase());
@@ -537,7 +537,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 
 	public ESimpleItem setMaterial(String material) {
 		if (material == null) {
-			EText.warn("&4Incorrect Material for key:&a'" + key + "' &4in file:&a'" + file.getFile().getName() + "'", EI.prefix);
+			Texts.warn("&4Incorrect Material for key:&a'" + key + "' &4in file:&a'" + file.getFile().getName() + "'", EI.prefix);
 			return this;
 		}
 
@@ -603,7 +603,7 @@ public final class ESimpleItem extends ItemStack implements EItem {
 	}
 
 	public void export() {
-		settings.exportToYAML(getFile(), getKey());
+		settings.exportYaml(getFile(), getKey());
 	}
 
 }

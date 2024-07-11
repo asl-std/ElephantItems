@@ -1,28 +1,27 @@
 package org.aslstd.ei.commands;
 
-import org.aslstd.api.bukkit.command.BasicCommand;
-import org.aslstd.api.bukkit.command.BasicCommandHandler;
-import org.aslstd.api.bukkit.command.interfaze.Usable;
-import org.bukkit.command.CommandSender;
+import org.dxrgd.api.open.command.Executor;
+import org.dxrgd.api.open.command.impl.CommandHandler;
+import org.dxrgd.api.open.command.impl.CommandNode;
 
-public class EIListCommand extends BasicCommand {
+public class EIListCommand extends CommandNode {
 
-	public EIListCommand(BasicCommandHandler handler, String label, Usable<CommandSender, String[]> func) {
-		super(handler, label, func);
+	public EIListCommand(CommandHandler handler, String label, Executor func) {
+		super(handler, label, 0, func);
 	}
 
 	@Override
-	public String getDescription() {
+	public String description() {
 		return "Shows list of eitems";
 	}
 
 	@Override
-	public String getUsage() {
+	public String usage() {
 		return "/eitems list [page]";
 	}
 
 	@Override
-	public String getPermission() {
+	public String permission() {
 		return "ei.commands.stats";
 	}
 

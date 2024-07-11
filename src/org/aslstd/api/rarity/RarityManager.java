@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.yaml.YAML;
 import org.aslstd.ei.EI;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
 
 public class RarityManager {
 
@@ -17,7 +17,7 @@ public class RarityManager {
 
 	public static ERarity getById(String id) {
 		for (final Entry<String, ERarity> entry : rarities.entrySet())
-			if (entry.getKey().equalsIgnoreCase(id) || EText.e(entry.getValue().getVisualName()).equalsIgnoreCase(EText.e(id))) return entry.getValue();
+			if (entry.getKey().equalsIgnoreCase(id) || Texts.e(entry.getValue().getVisualName()).equalsIgnoreCase(Texts.e(id))) return entry.getValue();
 		return null;
 	}
 
@@ -31,8 +31,8 @@ public class RarityManager {
 		while (files.size() > 0) {
 
 			final File file = files.remove(0);
-			if (YAML.getFileExtension(file).equals("yml")) {
-				final YAML util = new YAML(file);
+			if (Yaml.getFileExtension(file).equals("yml")) {
+				final Yaml util = new Yaml(file);
 
 				if (!util.contains("id")) util.set("id", file.getName().substring(0, file.getName().length()-4));
 

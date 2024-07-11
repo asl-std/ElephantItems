@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.settings.StringSettings;
-import org.aslstd.api.bukkit.yaml.YAML;
 import org.aslstd.ei.EI;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
 
 import lombok.Getter;
 
@@ -39,15 +39,15 @@ public class EAbility {
 				if (file.listFiles().length > 0) files.addAll(Arrays.asList(file.listFiles()));
 
 			} else
-				if (YAML.getFileExtension(file).equals("yml")) {
-					final YAML util = new YAML(file);
+				if (Yaml.getFileExtension(file).equals("yml")) {
+					final Yaml util = new Yaml(file);
 					if (util.getKeys(false).size() > 0) {
 						for (String section : util.getKeys(false)) {
 							section = section.toLowerCase();
 							final EAbility ability = new EAbility(section, util);
 
 							EAbility.registered.put(section, ability);
-							EText.debug("Ability: &5" + section + "&e successfully registered");
+							Texts.debug("Ability: &5" + section + "&e successfully registered");
 						}
 					}
 				}
@@ -62,29 +62,29 @@ public class EAbility {
 
 	@Getter private List<String> toLore;
 
-	@Getter private StringSettings settings;
+	@Getter private FileSettings settings;
 
-	public EAbility(String key, YAML file) {
+	public EAbility(String key, Yaml file) {
 		this.key = key;
 
-		settings = new StringSettings();
-		settings.importFromYAML(file, key);
+		settings = new FileSettings();
+		settings.importYaml(file, key);
 
 		type = AbilityType.from(settings.getValue("type"));
 
 		if (type == null) {
-			EText.warn("Incorrect Ability Type provided : " + key + " : " + settings.getValue("type") == null ? "null" : settings.getValue("type"));
+			Texts.warn("Incorrect Ability Type provided : " + key + " : " + settings.getValue("type") == null ? "null" : settings.getValue("type"));
 			return;
 		}
 
 		toLore = new ArrayList<>();
 		for (final String line : settings.exportArray("lore"))
-			toLore.add(EText.c(line));
+			toLore.add(Texts.c(line));
 
 		action = EI.getActionManager().getAction(settings.getValue("action"));
 
 		if (action == null) {
-			EText.warn("Incorrect Ability Action provided : " + key + " : " + settings.getValue("type") == null ? "null" : settings.getValue("type"));
+			Texts.warn("Incorrect Ability Action provided : " + key + " : " + settings.getValue("type") == null ? "null" : settings.getValue("type"));
 			return;
 		}
 

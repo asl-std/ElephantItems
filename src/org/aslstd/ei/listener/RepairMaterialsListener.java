@@ -1,23 +1,25 @@
 package org.aslstd.ei.listener;
 
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.value.Pair;
 import org.aslstd.api.durability.RepairParams;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.plugin.listener.BukkitListener;
+import org.dxrgd.api.open.plugin.listener.Named;
+import org.dxrgd.api.open.value.Pair;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
-public class RepairMaterialsListener implements Listener {
+@Named(key = "repairMaterials")
+public class RepairMaterialsListener implements BukkitListener {
 
 	@EventHandler
 	public void onAnvil(PrepareAnvilEvent e) {
@@ -34,7 +36,7 @@ public class RepairMaterialsListener implements Listener {
 
 		if (repair.getResult() != null) {
 			e.setResult(repair.getResult());
-			inv.setRepairCostAmount(1);
+			inv.setRepairCost(1);
 			inv.setRepairCost(repair.getMaterial().getRepairCost());
 		}
 	}
@@ -49,7 +51,7 @@ public class RepairMaterialsListener implements Listener {
 			if (e.getClickedInventory() != null)
 				if (isRestricted(e.getClickedInventory().getType())) {
 					e.setCancelled(true);
-					EText.send(e.getWhoClicked(), "&4You can't do it");
+					Texts.send(e.getWhoClicked(), "&4You can't do it");
 				}
 	}
 
@@ -63,7 +65,7 @@ public class RepairMaterialsListener implements Listener {
 			if (e.getInventory() != null)
 				if (isRestricted(e.getInventory().getType())) {
 					e.setCancelled(true);
-					EText.send(e.getWhoClicked(), "&4You can't do it");
+					Texts.send(e.getWhoClicked(), "&4You can't do it");
 				}
 	}
 

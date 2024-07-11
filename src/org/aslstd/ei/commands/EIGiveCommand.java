@@ -1,20 +1,19 @@
 package org.aslstd.ei.commands;
 
-import org.aslstd.api.bukkit.command.BasicCommand;
-import org.aslstd.api.bukkit.command.BasicCommandHandler;
-import org.aslstd.api.bukkit.command.interfaze.SenderType;
-import org.aslstd.api.bukkit.command.interfaze.Usable;
-import org.bukkit.command.CommandSender;
+import org.dxrgd.api.open.command.Executor;
+import org.dxrgd.api.open.command.SenderType;
+import org.dxrgd.api.open.command.impl.CommandHandler;
+import org.dxrgd.api.open.command.impl.CommandNode;
 
-public class EIGiveCommand extends BasicCommand {
+public class EIGiveCommand extends CommandNode {
 
-	public EIGiveCommand(BasicCommandHandler handler, String label, Usable<CommandSender, String[]> func) {
-		super(handler, label, func);
+	public EIGiveCommand(CommandHandler handler, String label, Executor func) {
+		super(handler, label, 1, func);
 		senderType = SenderType.ALL;
 	}
 
 	@Override
-	public String getDescription() {
+	public String description() {
 		if (senderType == SenderType.CONSOLE_ONLY)
 			return "Gives <eitem-id> to <player-name> player";
 		else
@@ -22,7 +21,7 @@ public class EIGiveCommand extends BasicCommand {
 	}
 
 	@Override
-	public String getUsage() {
+	public String usage() {
 		if (senderType == SenderType.CONSOLE_ONLY)
 			return "/eitems give <eitem-id> <player-name>";
 		else
@@ -30,7 +29,7 @@ public class EIGiveCommand extends BasicCommand {
 	}
 
 	@Override
-	public String getPermission() {
+	public String permission() {
 		return "ei.admin.give";
 	}
 

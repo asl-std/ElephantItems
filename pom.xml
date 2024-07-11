@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ru.aslteam</groupId>
 	<artifactId>elephantitems</artifactId>
@@ -21,33 +22,25 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.aslstd</groupId>
-			<artifactId>ejcore</artifactId>
-			<version>1.2.19</version>
+			<groupId>org.dxrgd</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 
-		<!--SpigotAPI -->
+		<!-- PaperAPI -->
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.19.2-R0.1-SNAPSHOT</version>
+			<groupId>com.destroystokyo.paper</groupId>
+			<artifactId>paper-api</artifactId>
+			<version>1.16.5-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.22</version>
+			<version>1.18.30</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>haveric.recipeManager</groupId>
-			<artifactId>RecipeManager</artifactId>
-			<version>2.28.0</version>
-			<scope>system</scope>
-			<systemPath>D:\Eclipse IDE\Projects_ASL\ElephantItems\libs\RecipeManager.jar</systemPath>
 		</dependency>
 
 	</dependencies>
@@ -61,10 +54,10 @@
 			<layout>default</layout>
 		</repository>
 
-		<!--Spigot Repo -->
+		<!-- Paper Legacy -->
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+			<id>papermc</id>
+			<url>https://papermc.io/repo/repository/maven-public/</url>
 		</repository>
 
 		<!--PlaceholdersAPI Repo -->

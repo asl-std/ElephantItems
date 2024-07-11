@@ -6,25 +6,25 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.aslstd.api.bukkit.items.IStatus;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.value.Pair;
-import org.aslstd.api.bukkit.value.util.NumUtil;
-import org.aslstd.api.bukkit.yaml.EJConf;
-import org.aslstd.api.ejcore.plugin.EJPlugin;
 import org.aslstd.api.item.ESimpleItem;
 import org.aslstd.ei.config.conversion.Conversion;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.utility.IStatus;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.file.configuration.OConf;
+import org.dxrgd.api.open.plugin.OPlugin;
+import org.dxrgd.api.open.value.Pair;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
-public class ConvertConfig extends EJConf {
+public class ConvertConfig extends OConf {
 
 	public static final ConcurrentMap<Material, List<Conversion>> convert = new ConcurrentHashMap<>();
 
-	public ConvertConfig(String fileName, EJPlugin plugin) {
+	public ConvertConfig(String fileName, OPlugin plugin) {
 		super(fileName, plugin);
 	}
 
@@ -35,7 +35,7 @@ public class ConvertConfig extends EJConf {
 		for (final String key : getKeys(false)) {
 			final Material mat = Material.matchMaterial(key);
 
-			if (mat == null) { EText.warn("Incorrect Material id! " + key + ", skipped!"); continue; }
+			if (mat == null) { Texts.warn("Incorrect Material id! " + key + ", skipped!"); continue; }
 
 			final List<Conversion> conversion = new ArrayList<>();
 
@@ -56,12 +56,12 @@ public class ConvertConfig extends EJConf {
 
 				for (final String id : itemID)
 					if (ESimpleItem.getById(id.split(" ")[0]) == null) {
-						EText.warn("Incorrect EItem id! " + section + ": " + id + ", skipped!");
+						Texts.warn("Incorrect EItem id! " + section + ": " + id + ", skipped!");
 						incorrect = true;
 					}
 
 				if (displayName == null) {
-					EText.warn("DisplayName cannot be null! " + section + ", skipped!");
+					Texts.warn("DisplayName cannot be null! " + section + ", skipped!");
 					incorrect = true;
 				}
 
@@ -78,7 +78,7 @@ public class ConvertConfig extends EJConf {
 
 					ids.sort(Comparator.comparingDouble(Pair::getSecond));
 
-					conversion.add(new Conversion(EText.e(displayName), ids));
+					conversion.add(new Conversion(Texts.e(displayName), ids));
 				}
 			}
 
@@ -120,7 +120,7 @@ public class ConvertConfig extends EJConf {
 				}
 			}
 
-		final String displayName = EText.e(stack.getItemMeta().getDisplayName());
+		final String displayName = Texts.e(stack.getItemMeta().getDisplayName());
 
 		for (final Conversion conv : conversion) {
 			if (conv.getTrigger_displayName().equalsIgnoreCase(displayName)) {

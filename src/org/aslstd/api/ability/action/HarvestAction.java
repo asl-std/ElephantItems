@@ -6,12 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.aslstd.api.ability.BasicAction;
-import org.aslstd.api.bukkit.blocks.BlockUtil;
 import org.aslstd.api.bukkit.equip.EquipSlot;
-import org.aslstd.api.bukkit.items.InventoryUtil;
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.settings.StringSettings;
-import org.aslstd.api.bukkit.value.util.NumUtil;
 import org.aslstd.api.durability.DManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -19,6 +14,11 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
+import org.dxrgd.api.bukkit.utility.BlockUtil;
+import org.dxrgd.api.bukkit.utility.InventoryUtil;
+import org.dxrgd.api.open.value.util.NumUtil;
 
 public class HarvestAction extends BasicAction {
 
@@ -32,8 +32,8 @@ public class HarvestAction extends BasicAction {
 	}
 
 	@Override
-	public void acceptSettings(StringSettings settings) {
-		if (!settings.hasValue("settings.radius")) { EText.warn("Harvest action has incorrect settings"); return;}
+	public void acceptSettings(FileSettings settings) {
+		if (!settings.hasValue("settings.radius")) { Texts.warn("Harvest action has incorrect settings"); return;}
 
 		radius = NumUtil.parseInteger(settings.getValue("settings.radius"));
 
@@ -48,7 +48,7 @@ public class HarvestAction extends BasicAction {
 			for (final String mat : crops) {
 				final Material search = Material.matchMaterial(mat);
 				if (search == null) {
-					EText.debug("Incorrect material provided in crops list: " + mat + " in ability " + getKey() + ", material skipped");
+					Texts.debug("Incorrect material provided in crops list: " + mat + " in ability " + getKey() + ", material skipped");
 				} else
 					harvestableCrops.add(search);
 			}
@@ -77,7 +77,7 @@ public class HarvestAction extends BasicAction {
 
 			for (final ItemStack drop : drops)
 				if (drop.getType().name().contains("SEED")) {
-				}else
+				} else
 					InventoryUtil.addItem(drop, e.getPlayer());
 
 			data.setAge(0);

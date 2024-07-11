@@ -8,16 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.aslstd.api.ability.EAbility;
 import org.aslstd.api.ability.action.ActionManager;
-import org.aslstd.api.attributes.managers.WAttributes;
-import org.aslstd.api.bukkit.items.ItemStackUtil;
-import org.aslstd.api.bukkit.message.EText;
-import org.aslstd.api.bukkit.yaml.YAML;
+import org.aslstd.api.attributes.AttrManager;
 import org.aslstd.api.durability.material.RepairMaterial;
-import org.aslstd.api.ejcore.plugin.EJPlugin;
 import org.aslstd.api.item.ESimpleItem;
 import org.aslstd.api.item.ItemManager;
 import org.aslstd.api.rarity.RarityManager;
-import org.aslstd.core.listeners.RegisterEventListener;
 import org.aslstd.ei.commands.EICommandHandler;
 import org.aslstd.ei.config.ConvertConfig;
 import org.aslstd.ei.config.GConfig;
@@ -31,17 +26,22 @@ import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.bukkit.utility.ItemStackUtil;
+import org.dxrgd.api.open.file.configuration.type.Yaml;
+import org.dxrgd.api.open.plugin.OPlugin;
+import org.dxrgd.api.open.registers.Listeners.Collector;
 
 import lombok.Getter;
 
-public class EI extends EJPlugin {
+public class EI extends OPlugin {
 
 	public static final String prefix = "EIT";
 
 	@Getter private static LangConfig		lang			= null;
 	@Getter private static GConfig			gconfig			= null;
 	@Getter private static ConvertConfig	convertConfig	= null;
-	@Getter private static YAML 			guiConfig		= null;
+	@Getter private static Yaml 			guiConfig		= null;
 	@Getter private static ActionManager	actionManager 	= null;
 	private static EI						instance		= null;
 	public static EI instance()	   { return instance; }
@@ -58,23 +58,19 @@ public class EI extends EJPlugin {
 	public static boolean isRanged(Material mat) { return rangedWeapon.contains(mat.toString()); }
 
 	@Override
-	public int getPriority() { return 3; }
+	public int priority() { return 3; }
 
 	@Override
-	public void init() {
+	public void initialize() {
 		instance = this;
-		resourceId = 33799;
 		lang = new LangConfig(getDataFolder() + "/lang.yml", this);
 		gconfig = new GConfig(getDataFolder() + "/config.yml", this);
-		guiConfig = new YAML(getDataFolder() + "/gui.yml", this);
+		guiConfig = new Yaml(getDataFolder() + "/gui.yml", this);
 
 		exportDefaults();
 		final Metrics metrics = new Metrics(instance, 524);
 
-		RegisterEventListener.register("inventoryCheckEvent", new InventoryChangeListener());
-		RegisterEventListener.register("toolsUsing", new ToolUsingListener());
-		RegisterEventListener.register("conversion", new ConversionListener());
-		RegisterEventListener.register("repairMaterials", new RepairMaterialsListener());
+		Collector.forPlugin(this).collect(new InventoryChangeListener(), new ToolUsingListener(), new ConversionListener(), new RepairMaterialsListener());
 
 		actionManager = new ActionManager();
 		actionManager.register();
@@ -86,13 +82,13 @@ public class EI extends EJPlugin {
 
 		BasicTest.test();
 
-		new EICommandHandler().registerHandler();
+		new EICommandHandler().register();
 
 		ItemManager.process();
 		convertConfig  = new ConvertConfig(getDataFolder() + "/conversion.yml", this);
-		EText.fine("Currently " + RarityManager.rarities.size() + " rarities is registered", EI.prefix);
-		EText.fine("Currently " + WAttributes.getRegistered().size() + " attributes is registered", EI.prefix);
-		EText.fine("Currently " + ESimpleItem.getRegisteredID().size() + " items is registered", EI.prefix);
+		Texts.fine("Currently " + RarityManager.rarities.size() + " rarities is registered", EI.prefix);
+		Texts.fine("Currently " + AttrManager.getAttributes().size() + " attributes is registered", EI.prefix);
+		Texts.fine("Currently " + ESimpleItem.getRegisteredID().size() + " items is registered", EI.prefix);
 
 		metrics.addCustomChart(new SimplePie("itemsCreated", () -> {
 			final int itemsCount = ESimpleItem.getRegisteredID().size();
@@ -113,11 +109,8 @@ public class EI extends EJPlugin {
 
 	@Override
 	public void reloadPlugin() {
-		WAttributes.reloadAttributes();
-		RegisterEventListener.register("inventoryCheckEvent", new InventoryChangeListener());
-		RegisterEventListener.register("toolsUsing", new ToolUsingListener());
-		RegisterEventListener.register("conversion", new ConversionListener());
-		RegisterEventListener.register("repairMaterials", new RepairMaterialsListener());
+		AttrManager.reloadAttributes();
+		//Collector.forPlugin(this).collect(new InventoryChangeListener(), new ToolUsingListener(), new ConversionListener(), new RepairMaterialsListener());
 
 		ESimpleItem.unregisterAll();
 
@@ -142,12 +135,12 @@ public class EI extends EJPlugin {
 
 		EI.getConvertConfig().reload();
 
-		EText.fine("Currently " + RarityManager.rarities.size() + " rarities is registered", EI.prefix);
-		EText.fine("Currently " + EAbility.getRegistered().size() + " abilities is registered", EI.prefix);
-		EText.fine("Currently " + WAttributes.getRegistered().size() + " attributes is registered", EI.prefix);
-		EText.fine("Currently " + ESimpleItem.getRegisteredID().size() + " items is registered", EI.prefix);
-		EText.fine("Currently " + RepairMaterial.getMaterials().size() + " repair materials is registered", EI.prefix);
-		EText.fine("ElephantItems succesfully reloaded!", EI.prefix);
+		Texts.fine("Currently " + RarityManager.rarities.size() + " rarities is registered", EI.prefix);
+		Texts.fine("Currently " + EAbility.getRegistered().size() + " abilities is registered", EI.prefix);
+		Texts.fine("Currently " + AttrManager.getAttributes().size() + " attributes is registered", EI.prefix);
+		Texts.fine("Currently " + ESimpleItem.getRegisteredID().size() + " items is registered", EI.prefix);
+		Texts.fine("Currently " + RepairMaterial.getMaterials().size() + " repair materials is registered", EI.prefix);
+		Texts.fine("ElephantItems succesfully reloaded!", EI.prefix);
 	}
 
 	public final void exportDefaults() {
@@ -155,33 +148,33 @@ public class EI extends EJPlugin {
 		final File rarityFolder = new File(getDataFolder() + "/rarity");
 		final File abilityFolder = new File(getDataFolder() + "/abilities");
 
-		YAML.exportFile("defaults/exampleItemTemplate.yml", this, getDataFolder());
+		Yaml.exportFile("defaults/exampleItemTemplate.yml", this, getDataFolder());
 
-		YAML.exportFile("defaults/allowedMaterials.txt", this, getDataFolder());
+		Yaml.exportFile("defaults/allowedMaterials.txt", this, getDataFolder());
 
 		if (!itemsFolder.exists()) {
 			itemsFolder.mkdirs();
 
-			YAML.exportFile("defaults/example.yml", this, itemsFolder);
+			Yaml.exportFile("defaults/example.yml", this, itemsFolder);
 		}
 
 		if (!rarityFolder.exists()) {
 			rarityFolder.mkdirs();
 
-			YAML.exportFile("defaults/trash.yml", this, rarityFolder);
-			YAML.exportFile("defaults/common.yml", this, rarityFolder);
-			YAML.exportFile("defaults/uncommon.yml", this, rarityFolder);
-			YAML.exportFile("defaults/rare.yml", this, rarityFolder);
-			YAML.exportFile("defaults/epic.yml", this, rarityFolder);
-			YAML.exportFile("defaults/mythical.yml", this, rarityFolder);
-			YAML.exportFile("defaults/legendary.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/trash.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/common.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/uncommon.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/rare.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/epic.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/mythical.yml", this, rarityFolder);
+			Yaml.exportFile("defaults/legendary.yml", this, rarityFolder);
 		}
 
 		if (!abilityFolder.exists()) {
 			abilityFolder.mkdirs();
 
-			YAML.exportFile("defaults/ability-mining.yml", this, abilityFolder);
-			YAML.exportFile("defaults/ability-harvest.yml", this, abilityFolder);
+			Yaml.exportFile("defaults/ability-mining.yml", this, abilityFolder);
+			Yaml.exportFile("defaults/ability-harvest.yml", this, abilityFolder);
 		}
 	}
 

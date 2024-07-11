@@ -1,8 +1,8 @@
 package org.aslstd.api.ability;
 
-import org.aslstd.api.bukkit.settings.StringSettings;
 import org.bukkit.event.Event;
 import org.bukkit.util.Consumer;
+import org.dxrgd.api.bukkit.setting.impl.FileSettings;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public abstract class BasicAction {
 
 	public abstract boolean requiresThisEvent(Event e);
 
-	public abstract void acceptSettings(StringSettings settings);
+	public abstract void acceptSettings(FileSettings settings);
 
 	@Override
 	public abstract BasicAction clone();

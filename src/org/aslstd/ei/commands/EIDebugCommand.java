@@ -1,26 +1,26 @@
 package org.aslstd.ei.commands;
 
-import org.aslstd.api.bukkit.command.BasicCommand;
-import org.aslstd.api.bukkit.command.BasicCommandHandler;
-import org.aslstd.api.bukkit.command.interfaze.SenderType;
 import org.aslstd.api.bukkit.equip.EquipType;
-import org.aslstd.api.bukkit.message.EText;
 import org.aslstd.api.durability.DManager;
 import org.bukkit.entity.Player;
+import org.dxrgd.api.bukkit.message.Texts;
+import org.dxrgd.api.open.command.SenderType;
+import org.dxrgd.api.open.command.impl.CommandHandler;
+import org.dxrgd.api.open.command.impl.CommandNode;
 
-public class EIDebugCommand extends BasicCommand {
+public class EIDebugCommand extends CommandNode {
 
-	public EIDebugCommand(BasicCommandHandler handler) {
-		super(handler, "debug", (s, args) -> {
-			if (args.length <= 0)
+	public EIDebugCommand(CommandHandler handler) {
+		super(handler, "debug", 1, (s, args) -> {
+			if (args.length() <= 0)
 				return "Incorrect argument: /eitems debug <debugType>";
 
 			final Player p = (Player) s;
 
-			switch (args[0].toLowerCase()) {
-			case "durability":
-				EText.send(p, DManager.getDurabilityString(p, EquipType.HAND));
-				break;
+			switch (args.arg(0).toLowerCase()) {
+				case "durability":
+					Texts.send(p, DManager.getDurabilityString(p, EquipType.HAND));
+					break;
 			}
 			return null;
 		});

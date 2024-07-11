@@ -8,7 +8,6 @@ public interface Serializable {
 
 	Map<String, Object> serialize(ItemStack stack);
 
-
 	ItemStack deserialize(Map<String, Object> data);
 
 }
